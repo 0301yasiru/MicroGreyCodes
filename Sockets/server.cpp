@@ -1,3 +1,6 @@
+// Program by: Yasiru Senerath Karunanayaka
+
+
 #include <iostream>
 #include <WS2tcpip.h>
 
@@ -52,7 +55,6 @@ int main(){
     char service[NI_MAXHOST]; // service port number
 
     ZeroMemory(host, NI_MAXHOST);
-    ZeroMemory(host, "192.168,8,105");
     // close listening socket
 
 
