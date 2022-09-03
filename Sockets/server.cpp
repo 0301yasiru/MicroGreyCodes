@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <WS2tcpip.h>
+#include <Winsock2.h>
 
+#define WIN32_LEAN_AND_MEAN
 #pragma comment (lib, "ws2_32.lib")
 
 using namespace std;
@@ -55,17 +57,50 @@ int main(){
     char service[NI_MAXHOST]; // service port number
 
     ZeroMemory(host, NI_MAXHOST);
+    ZeroMemory(service, NI_MAXHOST);
+
+    if (getnameinfo((sockaddr*)&client, sizeof(client), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0){
+
+        cout << host << " connected on service " << service << endl;
+
+    }else{
+        inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
+        cout << host << " connected on port" << ntohs(client.sin_port) << endl;
+    }
+
     // close listening socket
+    closesocket(listening);
+    
 
+    // accept and connect with client while loop
+    char buf[4096];
+    while (true)
+    {
+        ZeroMemory(buf, 4096);
 
+        int bytesRecived = recv(clientSocket, buf, 4096, 0);
 
+        if (bytesRecived == SOCKET_ERROR){
+            cerr << "Error in reviing data" << endl;
+            break;
+        }
 
+        if (bytesRecived == 0){
+            cout << "Client disconnected" << endl;
+            break;
+        }
 
+        send(clientSocket, buf, bytesRecived + 1, 0);
+
+    }
+    
 
 
     // close the socket
+    closesocket(clientSocket);
 
     // shutdown the winsock
+    WSACleanup();
 
     return 0;
 }// end of the main file
